@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/microsoft/azure-devops-go-api/azuredevops/workitemtracking"
 )
@@ -24,17 +25,34 @@ type GetCmdOptions struct {
 
 // GetCmdInteractor implements Cmd interface.
 type GetCmdInteractor struct {
-	GetCmdOptions               *GetCmdOptions
-	WorkItemUpdateTracker       WorkItemUpdateTracker
-	WorkItemSpendTimeCalculator WorkItemSpendTimeCalculator
+	GetCmdOptions            *GetCmdOptions
+	WorkItemUpdateTracker    WorkItemUpdateTracker
+	WorkItemUpdateCalculator WorkItemUpdateCalculator
+	WorkItemUpdatePresenter  WorkItemUpdatePresenter
 }
 
 type WorkItemUpdateTracker interface {
 	Get(GetCmdOptions) (*[]workitemtracking.WorkItemUpdate, error)
 }
 
-type WorkItemSpendTimeCalculator interface {
-	Calculate(State, *[]workitemtracking.WorkItemUpdate)
+type WorkItemUpdateHistories struct {
+	TargetState    State
+	HistoryList    []WorkItemUpdateHistory
+	TotalSpendTime time.Duration
+}
+
+type WorkItemUpdateHistory struct {
+	StartTime time.Time
+	EndTime   time.Time
+	SpendTime time.Duration
+}
+
+type WorkItemUpdateCalculator interface {
+	Calculate(targetState State, updateList *[]workitemtracking.WorkItemUpdate) WorkItemUpdateHistories
+}
+
+type WorkItemUpdatePresenter interface {
+	Output(WorkItemUpdateHistories)
 }
 
 func (g GetCmdInteractor) Execute() error {
@@ -43,7 +61,11 @@ func (g GetCmdInteractor) Execute() error {
 		fmt.Println(err)
 		return err
 	}
-	g.WorkItemSpendTimeCalculator.Calculate(StateNew, workItemUpdates)
-	g.WorkItemSpendTimeCalculator.Calculate(StateActive, workItemUpdates)
+
+	newWorkItemUpdateHistories := g.WorkItemUpdateCalculator.Calculate(StateNew, workItemUpdates)
+	g.WorkItemUpdatePresenter.Output(newWorkItemUpdateHistories)
+
+	activeWorkItemUpdateHistories := g.WorkItemUpdateCalculator.Calculate(StateActive, workItemUpdates)
+	g.WorkItemUpdatePresenter.Output(activeWorkItemUpdateHistories)
 	return nil
 }

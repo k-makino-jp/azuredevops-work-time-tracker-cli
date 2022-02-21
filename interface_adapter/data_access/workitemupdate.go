@@ -1,4 +1,4 @@
-package repository
+package data_access
 
 import (
 	"github.com/k-makino-jp/azuredevops-work-time-tracker-cli/entity"
@@ -11,16 +11,16 @@ type AzureDevOpsClient interface {
 	GetUpdates(usecase.GetCmdOptions) (*[]workitemtracking.WorkItemUpdate, error)
 }
 
-type workItemUpdateRepository struct {
+type workItemUpdateDataAccessor struct {
 	client AzureDevOpsClient
 }
 
-func NewWorkItemUpdateRepository(config entity.Config) *workItemUpdateRepository {
-	return &workItemUpdateRepository{
+func NewWorkItemUpdateDataAccessor(config entity.Config) *workItemUpdateDataAccessor {
+	return &workItemUpdateDataAccessor{
 		client: azuredevops.NewClient(config),
 	}
 }
 
-func (w workItemUpdateRepository) Get(getCmdOptions usecase.GetCmdOptions) (*[]workitemtracking.WorkItemUpdate, error) {
+func (w workItemUpdateDataAccessor) Get(getCmdOptions usecase.GetCmdOptions) (*[]workitemtracking.WorkItemUpdate, error) {
 	return w.client.GetUpdates(getCmdOptions)
 }

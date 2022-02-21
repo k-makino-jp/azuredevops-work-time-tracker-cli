@@ -30,9 +30,9 @@
    * フォーマット
       ```json
       {
-         "organization":"<organization>" ,
-         "project":"<project>",
-         "id": <Ticket id>
+         "organization":"your-organization-name" ,
+         "project":"your-project-name",
+         "id": 1 // ticket id
       }
       ```
    * 例
@@ -40,12 +40,12 @@
        {
            "organization":"worktimetracker-org" ,
            "project":"worktimetracker-prj",
-           "id": 100
+           "id": 1
        }
        ```
 2. 以下のコマンドを実行します。
    ```sh
-   $ go run main.go get -k "<Personal Access Token>"
+   $ go run main.go get -p "<Personal Access Token>"
 
    # Target State: New
 
