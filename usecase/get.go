@@ -33,9 +33,9 @@ const (
 )
 
 type GetCmdOptions struct {
-	Id       int
-	Pat      string
-	Statuses string
+	Id     int
+	Pat    string
+	States string
 }
 
 type WorkItemUpdateHistories struct {
@@ -76,10 +76,10 @@ func (g GetCmdInteractor) Execute() error {
 		return err
 	}
 
-	states := strings.Split(g.GetCmdOptions.Statuses, ",")
+	states := strings.Split(g.GetCmdOptions.States, ",")
 	for _, state := range states {
 		if !State(state).IsValid() {
-			fmt.Println("WARNING: Invalid work item state is specified:", state)
+			fmt.Printf("WARNING: Invalid work item state %s is specified. Available states are \"New\", \"Active\" and \"Closed\"\n", state)
 			continue
 		}
 		workItemUpdateHistories := g.WorkItemUpdateCalculator.Calculate(State(state), workItemUpdates)

@@ -16,7 +16,7 @@
 
 本 CLI ツールは、以下の機能を提供します。
 
-* [Updates - List](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/updates/list?view=azure-devops-rest-6.0) API で WorkItem の New および Active 時間を集計します。
+* [Updates - List](https://docs.microsoft.com/en-us/rest/api/azure/devops/wit/updates/list?view=azure-devops-rest-6.0) API で WorkItem の New、Active または Closed の 時間を集計します。
 
 ## 実行方法
 
