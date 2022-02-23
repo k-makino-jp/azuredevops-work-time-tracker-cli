@@ -41,7 +41,7 @@
            "project":"worktimetracker-prj"
        }
        ```
-2. 以下のコマンドを実行します。
+1. 以下のコマンドを実行します。
    ```sh
    $ go run main.go get -i <WorkItem ID> -p "<Personal Access Token>" -s "<StatusA,StatusB>"
 

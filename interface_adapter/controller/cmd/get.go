@@ -22,10 +22,10 @@ var (
 		Use:     "get",
 		Short:   "Get work item updates histories.",
 		Long:    "Get work item updates histories.",
-		Example: `devopsctl get -i 100 -p "personalaccesstoken -s "New,Active""`,
+		Example: `devopsctl get -i 100 -p "personalaccesstoken" -s "New,Active"`,
 		Run: func(cmd *cobra.Command, args []string) {
 			if err := useCaseGetCmd.Execute(); err != nil {
-				fmt.Printf("ERROR: get subcommand error occurred: %v", err)
+				fmt.Printf("ERROR: failed to execute get subcommand: %v", err)
 			}
 		},
 	}
@@ -43,7 +43,7 @@ func init() {
 	configRepository := data_access.NewConfigDataAccessor()
 	config, err := configRepository.Read()
 	if err != nil {
-		log.Fatalln("ERROR:", err)
+		log.Fatalf("ERROR: failed to initialize config: %s", err)
 	}
 
 	useCaseGetCmd = usecase.GetCmdInteractor{

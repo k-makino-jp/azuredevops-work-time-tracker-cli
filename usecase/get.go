@@ -79,7 +79,7 @@ func (g GetCmdInteractor) Execute() error {
 	states := strings.Split(g.GetCmdOptions.States, ",")
 	for _, state := range states {
 		if !State(state).IsValid() {
-			fmt.Printf("WARNING: Invalid work item state %s is specified. Available states are \"New\", \"Active\" and \"Closed\"\n", state)
+			fmt.Printf("WARNING: invalid work item state %s is specified. Available states are \"New\", \"Active\" and \"Closed\"\n", state)
 			continue
 		}
 		workItemUpdateHistories := g.WorkItemUpdateCalculator.Calculate(State(state), workItemUpdates)
