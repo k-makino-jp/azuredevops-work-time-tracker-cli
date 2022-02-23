@@ -5,6 +5,7 @@ Copyright © 2022 k-makino-jp
 package cmd
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/k-makino-jp/azuredevops-work-time-tracker-cli/interface_adapter/data_access"
@@ -15,29 +16,34 @@ import (
 
 var (
 	useCaseGetCmd usecase.Cmd
-	pat           string
 
 	// getCmd represents the get command
 	getCmd = &cobra.Command{
-		Use:   "get",
-		Short: "get short description",
-		Long:  "get long description",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return useCaseGetCmd.Execute()
+		Use:     "get",
+		Short:   "Get work item updates histories.",
+		Long:    "Get work item updates histories.",
+		Example: `devopsctl get -i 100 -p "personalaccesstoken -s "New,Active""`,
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := useCaseGetCmd.Execute(); err != nil {
+				fmt.Println("ERROR:", err)
+			}
 		},
 	}
 )
 
 func init() {
 	getCmdOptions := usecase.GetCmdOptions{}
+	getCmd.Flags().IntVarP(&getCmdOptions.Id, "id", "i", 0, "Azure DevOps WorkItem ID (required)")
 	getCmd.Flags().StringVarP(&getCmdOptions.Pat, "pat", "p", "", "Azure DevOps Personal Access Token (required)")
+	getCmd.Flags().StringVarP(&getCmdOptions.Statuses, "states", "s", "Active", "Azure DevOps WorkItem Statuses (comma separated values)")
+	getCmd.MarkFlagRequired("id")
 	getCmd.MarkFlagRequired("pat")
 	rootCmdController.AddCommand(getCmd)
 
 	configRepository := data_access.NewConfigDataAccessor()
 	config, err := configRepository.Read()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln("ERROR:", err)
 	}
 
 	useCaseGetCmd = usecase.GetCmdInteractor{

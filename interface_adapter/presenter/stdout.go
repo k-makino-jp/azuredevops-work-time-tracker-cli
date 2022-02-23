@@ -16,8 +16,8 @@ func (w workItemUpdateStdoutPresenter) Output(workItemUpdateHistories usecase.Wo
 	fmt.Printf("# Target State: %s\n\n", workItemUpdateHistories.TargetState.String())
 	fmt.Printf("## Histories\n\n")
 	fmt.Println("| Start Time           | End Time             | Spend Time [hours]   |")
-	fmt.Println("| -------------------- | ---------------------| -------------------- |")
-	for _, workItemUpdateHistory := range workItemUpdateHistories.HistoryList {
+	fmt.Println("| -------------------- | -------------------- | -------------------- |")
+	for _, workItemUpdateHistory := range workItemUpdateHistories.Histories {
 		formattedStartTime := workItemUpdateHistory.StartTime.Format("2006-01-02T15:04:05Z")
 		formattedEndTime := workItemUpdateHistory.EndTime.Format("2006-01-02T15:04:05Z")
 		fmt.Printf("| %s | %s | %05.2f                |\n", formattedStartTime, formattedEndTime, workItemUpdateHistory.SpendTime.Hours())

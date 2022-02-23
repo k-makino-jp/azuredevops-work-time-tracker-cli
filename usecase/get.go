@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/microsoft/azure-devops-go-api/azuredevops/workitemtracking"
@@ -13,6 +14,18 @@ func (s State) String() string {
 	return string(s)
 }
 
+func (s State) IsValid() bool {
+	switch s {
+	case StateNew:
+		return true
+	case StateActive:
+		return true
+	case StateClosed:
+		return true
+	}
+	return false
+}
+
 const (
 	StateNew    State = "New"
 	StateActive State = "Active"
@@ -20,7 +33,21 @@ const (
 )
 
 type GetCmdOptions struct {
-	Pat string
+	Id       int
+	Pat      string
+	Statuses string
+}
+
+type WorkItemUpdateHistories struct {
+	TargetState    State
+	Histories      []WorkItemUpdateHistory
+	TotalSpendTime time.Duration
+}
+
+type WorkItemUpdateHistory struct {
+	StartTime time.Time
+	EndTime   time.Time
+	SpendTime time.Duration
 }
 
 // GetCmdInteractor implements Cmd interface.
@@ -32,19 +59,7 @@ type GetCmdInteractor struct {
 }
 
 type WorkItemUpdateTracker interface {
-	Get(GetCmdOptions) (*[]workitemtracking.WorkItemUpdate, error)
-}
-
-type WorkItemUpdateHistories struct {
-	TargetState    State
-	HistoryList    []WorkItemUpdateHistory
-	TotalSpendTime time.Duration
-}
-
-type WorkItemUpdateHistory struct {
-	StartTime time.Time
-	EndTime   time.Time
-	SpendTime time.Duration
+	Get(id int, pat string) (*[]workitemtracking.WorkItemUpdate, error)
 }
 
 type WorkItemUpdateCalculator interface {
@@ -56,16 +71,19 @@ type WorkItemUpdatePresenter interface {
 }
 
 func (g GetCmdInteractor) Execute() error {
-	workItemUpdates, err := g.WorkItemUpdateTracker.Get(*g.GetCmdOptions)
+	workItemUpdates, err := g.WorkItemUpdateTracker.Get(g.GetCmdOptions.Id, g.GetCmdOptions.Pat)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
-	newWorkItemUpdateHistories := g.WorkItemUpdateCalculator.Calculate(StateNew, workItemUpdates)
-	g.WorkItemUpdatePresenter.Output(newWorkItemUpdateHistories)
-
-	activeWorkItemUpdateHistories := g.WorkItemUpdateCalculator.Calculate(StateActive, workItemUpdates)
-	g.WorkItemUpdatePresenter.Output(activeWorkItemUpdateHistories)
+	states := strings.Split(g.GetCmdOptions.Statuses, ",")
+	for _, state := range states {
+		if !State(state).IsValid() {
+			fmt.Println("WARNING: Invalid work item state is specified:", state)
+			continue
+		}
+		workItemUpdateHistories := g.WorkItemUpdateCalculator.Calculate(State(state), workItemUpdates)
+		g.WorkItemUpdatePresenter.Output(workItemUpdateHistories)
+	}
 	return nil
 }

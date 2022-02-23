@@ -45,7 +45,7 @@ func (w workItemUpdateCalculator) Calculate(targetState usecase.State, updateLis
 			EndTime:   endTime,
 			SpendTime: spendTime,
 		}
-		workItemUpdateHistories.HistoryList = append(workItemUpdateHistories.HistoryList, workItemUpdateHistory)
+		workItemUpdateHistories.Histories = append(workItemUpdateHistories.Histories, workItemUpdateHistory)
 	}
 	workItemUpdateHistories.TargetState = targetState
 	workItemUpdateHistories.TotalSpendTime = totalDiff

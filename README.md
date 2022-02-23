@@ -31,21 +31,22 @@
       ```json
       {
          "organization":"your-organization-name" ,
-         "project":"your-project-name",
-         "id": 1 // ticket id
+         "project":"your-project-name"
       }
       ```
    * 例
        ```json
        {
            "organization":"worktimetracker-org" ,
-           "project":"worktimetracker-prj",
-           "id": 1
+           "project":"worktimetracker-prj"
        }
        ```
 2. 以下のコマンドを実行します。
    ```sh
-   $ go run main.go get -p "<Personal Access Token>"
+   $ go run main.go get -i <WorkItem ID> -p "<Personal Access Token>" -s "<StatusA,StatusB>"
+
+   [Example]
+   $ go run main.go get -i 100 -p "personalaccesstoken" -s "New,Active"
 
    # Target State: New
 

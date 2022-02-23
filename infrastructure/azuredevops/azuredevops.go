@@ -5,9 +5,13 @@ import (
 	"net/url"
 
 	"github.com/k-makino-jp/azuredevops-work-time-tracker-cli/entity"
-	"github.com/k-makino-jp/azuredevops-work-time-tracker-cli/usecase"
 	"github.com/microsoft/azure-devops-go-api/azuredevops"
 	"github.com/microsoft/azure-devops-go-api/azuredevops/workitemtracking"
+)
+
+const (
+	httpsSchema     = "https"
+	azureDevOpsHost = "dev.azure.com"
 )
 
 type client struct {
@@ -16,25 +20,21 @@ type client struct {
 	Project string
 }
 
-const (
-	HttpsSchema     = "https"
-	AzureDevOpsHost = "dev.azure.com"
-)
-
+// NewClient returns instance of azure devops rest client.
 func NewClient(config entity.Config) *client {
 	return &client{
 		Url: &url.URL{
-			Scheme: HttpsSchema,
-			Host:   AzureDevOpsHost,
+			Scheme: httpsSchema,
+			Host:   azureDevOpsHost,
 			Path:   config.Organization,
 		},
-		Id:      config.Id,
 		Project: config.Project,
 	}
 }
 
-func (a client) GetUpdates(getCmdOptions usecase.GetCmdOptions) (*[]workitemtracking.WorkItemUpdate, error) {
-	connection := azuredevops.NewPatConnection(a.Url.String(), getCmdOptions.Pat)
+// GetUpdates calls "Updates - List" API.
+func (a client) GetUpdates(id int, pat string) (*[]workitemtracking.WorkItemUpdate, error) {
+	connection := azuredevops.NewPatConnection(a.Url.String(), pat)
 	ctx := context.Background()
 
 	workItemTrackingClient, err := workitemtracking.NewClient(ctx, connection)
@@ -43,7 +43,7 @@ func (a client) GetUpdates(getCmdOptions usecase.GetCmdOptions) (*[]workitemtrac
 	}
 
 	updatesArgs := workitemtracking.GetUpdatesArgs{
-		Id:      &a.Id,
+		Id:      &id,
 		Project: &a.Project,
 	}
 	return workItemTrackingClient.GetUpdates(ctx, updatesArgs)
