@@ -21,6 +21,12 @@ func (w workItemUpdateCalculator) Calculate(targetState usecase.State, updateLis
 	var workItemUpdateHistories usecase.WorkItemUpdateHistories
 	var totalDiff time.Duration
 	for _, update := range *updateList {
+		if update.Fields == nil {
+			continue
+		}
+		if _, ok := (*update.Fields)["System.State"]; !ok {
+			continue
+		}
 		if (*update.Fields)["System.State"].NewValue != targetState.String() {
 			continue
 		}
